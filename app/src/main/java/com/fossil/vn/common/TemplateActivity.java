@@ -35,10 +35,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fossil.vn.InitActivity;
 import com.fossil.vn.history.HistoryFragment;
 import com.fossil.vn.history.HistoryActivity;
 import com.fossil.vn.R;
+import com.fossil.vn.service.TrackingService;
 
 import java.util.List;
 
@@ -255,6 +255,25 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         refreshUI();
         boolean isReady = requestPermission();
         initCurrentState(isReady);
+    }
+
+    public void startRecord() {
+        //Todo : start service, create new record with isFinished = false
+        Intent intent = new Intent(this, TrackingService.class);
+        intent.putExtra(TrackingService.EVENT_EXTRA, TrackingService.ACTION_NEW_RECORD);
+        startService(intent);
+    }
+
+    public void pauseRecord() {
+        //Todo: send message to service to skip tracking event
+    }
+
+    public void resumeRecord() {
+        //Todo: send message to service to resume tracking
+    }
+
+    public void stopRecord() {
+        // Todo: stop service , update record with isFinished = true
     }
 
     public interface FragmentBackListener {

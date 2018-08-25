@@ -12,26 +12,21 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.fossil.vn.R;
 import com.fossil.vn.common.BaseFragment;
 import com.fossil.vn.common.TemplateActivity;
-import com.fossil.vn.model.RecordModel;
 import com.fossil.vn.record.RecordActivity;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.fossil.vn.room.entity.RecordSession;
+import com.fossil.vn.room.repository.RecordSessionRepository;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static android.widget.LinearLayout.HORIZONTAL;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 import static android.widget.LinearLayout.VERTICAL;
 
 
@@ -125,15 +120,31 @@ public class HistoryFragment extends BaseFragment implements TemplateActivity.Fr
     }
 
     private void initDataDemo() {
-        List<RecordModel> listData = new ArrayList<>();
-        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(-33.920455, 18.466941), new LatLng(-33.920455, 18.466941)));
-        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-        historyAdapter.initData(listData);
+        RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getActivity().getApplicationContext());
+
+//        List<RecordSession> listData = new ArrayList<>();
+//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(-33.920455, 18.466941), new LatLng(-33.920455, 18.466941)));
+//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
+//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
+//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
+//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
+//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
+//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
+        recordSessionRepository.getAllRecord()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<List<RecordSession>>() {
+                    @Override
+                    public void accept(List<RecordSession> recordSessions) throws Exception {
+                        historyAdapter.initData(recordSessions);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                });
+
     }
 
 }

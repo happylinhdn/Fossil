@@ -1,10 +1,8 @@
 package com.fossil.vn.record;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +12,12 @@ import com.fossil.vn.R;
 import com.fossil.vn.common.BaseFragment;
 import com.fossil.vn.common.TemplateActivity;
 import com.fossil.vn.history.HistoryActivity;
-import com.fossil.vn.model.RecordModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 
 public class RecordFragment extends BaseFragment implements TemplateActivity.FragmentBackListener, OnMapReadyCallback {
@@ -32,6 +28,10 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
     TextView tvDistance;
     TextView tvDuration;
     GoogleMap map;
+    View btnStart;
+    View btnPause;
+    View btnResume;
+    View btnStop;
 
     @Nullable
     @Override
@@ -49,6 +49,36 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
             // Set the map ready callback to receive the GoogleMap object
             mapView.getMapAsync(this);
         }
+
+        btnStart = viwCurrent.findViewById(R.id.btn_start);
+        btnPause = viwCurrent.findViewById(R.id.btn_pause);
+        btnResume = viwCurrent.findViewById(R.id.btn_resume);
+        btnStop = viwCurrent.findViewById(R.id.btn_stop);
+        btnStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startSession();
+            }
+        });
+        btnPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pauseSession();
+            }
+        });
+        btnResume.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resumeSession();
+            }
+        });
+        btnStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                stopSession();
+            }
+        });
+
 
         return viwCurrent;
     }
@@ -74,6 +104,37 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
         return true;
     }
 
+    private void startSession() {
+        btnStart.setVisibility(View.GONE);
+        btnPause.setVisibility(View.VISIBLE);
+        btnResume.setVisibility(View.GONE);
+        btnStop.setVisibility(View.GONE);
+        ((TemplateActivity)getActivity()).startRecord();
+    }
+
+    private void pauseSession() {
+        btnStart.setVisibility(View.GONE);
+        btnPause.setVisibility(View.GONE);
+        btnResume.setVisibility(View.VISIBLE);
+        btnStop.setVisibility(View.VISIBLE);
+        ((TemplateActivity)getActivity()).pauseRecord();
+    }
+
+    private void resumeSession() {
+        btnStart.setVisibility(View.GONE);
+        btnPause.setVisibility(View.VISIBLE);
+        btnResume.setVisibility(View.GONE);
+        btnStop.setVisibility(View.GONE);
+        ((TemplateActivity)getActivity()).resumeRecord();
+    }
+
+    private void stopSession() {
+        btnStart.setVisibility(View.VISIBLE);
+        btnPause.setVisibility(View.GONE);
+        btnResume.setVisibility(View.GONE);
+        btnStop.setVisibility(View.GONE);
+        ((TemplateActivity)getActivity()).startRecord();
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

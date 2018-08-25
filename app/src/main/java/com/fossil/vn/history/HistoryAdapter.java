@@ -5,24 +5,21 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.fossil.vn.R;
-import com.fossil.vn.model.RecordModel;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.fossil.vn.room.entity.RecordSession;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
-    private List<RecordModel> listData;
+    private List<RecordSession> listData;
     private Context context;
 
     public HistoryAdapter(Context context) {
@@ -31,7 +28,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         this.listData = new ArrayList<>();
     }
 
-    public void initData(List<RecordModel> listData) {
+    public void initData(List<RecordSession> listData) {
         this.listData.clear();
         this.listData.addAll(listData);
         notifyDataSetChanged();
@@ -93,27 +90,27 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         private void setMapLocation() {
             if (map == null) return;
 
-            RecordModel data = (RecordModel) mapView.getTag();
+            RecordSession data = (RecordSession) mapView.getTag();
             if (data == null) return;
 
-            // Add a marker for this item and set the camera
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(data.getStartLocation(), 13f));
-            map.addMarker(new MarkerOptions().position(data.getStartLocation()));
+            //Todo: Add a marker for this item and set the camera
+//            map.moveCamera(CameraUpdateFactory.newLatLngZoom(data.getStartLocation(), 13f));
+//            map.addMarker(new MarkerOptions().position(data.getStartLocation()));
 
             // Set the map type back to normal.
             map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         }
 
         private void bindView(int pos) {
-            RecordModel item = listData.get(pos);
+            RecordSession item = listData.get(pos);
             // Store a reference of the ViewHolder object in the layout.
             layout.setTag(this);
             // Store a reference to the item in the mapView's tag. We use it to get the
             // coordinate of a location, when setting the map location.
             mapView.setTag(item);
             setMapLocation();
-            tvDistance.setText(item.getDistance() + " km");
-            tvSpeed.setText(item.getSpeed() + " km/h");
+            tvDistance.setText("100 km");
+            tvSpeed.setText("100 km/h");
             tvDuration.setText("10:00:00");
         }
     }

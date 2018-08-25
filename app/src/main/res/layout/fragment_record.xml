@@ -105,30 +105,31 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Play" />
+                android:id="@+id/btn_start"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:text="Start"/>
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:id="@+id/btn_pause"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:text="Pause" />
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:id="@+id/btn_resume"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:text="Resume" />
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:id="@+id/btn_stop"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:text="Stop" />
         </LinearLayout>
 
