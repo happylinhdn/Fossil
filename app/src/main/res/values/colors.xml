@@ -3,4 +3,13 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <!-- Tools -->
+    <color name="colorSideBar">#FFC432</color>
+    <color name="colorBlackText">#FF000000</color>
+    <color name="colorWhiteText">#FFFFFF</color>
+    <color name="colorButtonClick">#70266E</color>
+    <color name="colorButtonNormal">#FFC432</color>
+    <color name="colorPrimaryPurple">#70266E</color>
+    <color name="colorYellowDark">#FCAF17</color>
 </resources>

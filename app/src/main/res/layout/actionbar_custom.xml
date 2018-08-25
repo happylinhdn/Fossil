@@ -1,0 +1,60 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/actionbar_backbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="?attr/actionBarItemBackground"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_arrow_back_black_24dp"
+        android:visibility="visible"/>
+
+    <LinearLayout
+        android:id="@+id/actionbar_titleOuter"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_toRightOf="@+id/actionbar_backbutton"
+        android:layout_toLeftOf="@+id/actionbar_homebutton">
+
+        <TextView
+            android:id="@+id/actionbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?attr/actionBarItemBackground"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="Easybook.com"
+            android:textColor="@color/colorBlackText"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/actionbar_homebutton"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/actionbar_drawerbutton"
+        android:background="?attr/actionBarItemBackground"
+        android:src="@drawable/ic_home_black"
+        />
+
+    <ImageButton
+        android:id="@+id/actionbar_drawerbutton"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="?attr/actionBarItemBackground"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_drawer" />
+
+
+</RelativeLayout>

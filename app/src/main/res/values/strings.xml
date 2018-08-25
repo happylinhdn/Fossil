@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Fossil</string>
     <string name="action_settings">Settings</string>
+    <string name="English">English</string>
+
+    <string name="title_Register">Register</string>
+    <string name="title_SignIn">Sign In</string>
+    <string name="Hi">Hi</string>
+    <string name="title_MyAccount">MY ACCOUNT</string>
 </resources>

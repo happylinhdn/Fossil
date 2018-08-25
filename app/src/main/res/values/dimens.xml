@@ -1,3 +1,13 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="left_margin_drawer">16dp</dimen>
+    <dimen name="navigation_drawer_width">260dp</dimen>
+    <dimen name="homebutton_margintop">10dp</dimen>
+    <dimen name="homebutton_marginright">10dp</dimen>
+    <dimen name="form_fontsize">16sp</dimen>
+    <dimen name="list_fontsize">15sp</dimen>
+    <dimen name="form_subtitlesize">18sp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>
