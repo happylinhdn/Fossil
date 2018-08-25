@@ -1,6 +1,8 @@
 package com.fossil.vn.common;
 
 import android.app.Activity;
+import android.content.Context;
+import android.location.LocationManager;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -34,5 +36,14 @@ public class Utils {
             ImageButton ibmDrawer = (ImageButton) activity.findViewById(R.id.actionbar_drawerbutton);
             ibmDrawer.setVisibility(View.VISIBLE);
         }
+    }
+
+    public static boolean isLocationEnable(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        // getting network status
+        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        return (isGPSEnabled || isNetworkEnabled);
     }
 }

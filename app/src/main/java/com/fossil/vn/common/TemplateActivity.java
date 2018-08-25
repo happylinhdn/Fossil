@@ -1,11 +1,19 @@
 package com.fossil.vn.common;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -13,6 +21,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -24,7 +33,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.fossil.vn.InitActivity;
 import com.fossil.vn.history.HistoryFragment;
 import com.fossil.vn.history.HistoryActivity;
 import com.fossil.vn.R;
@@ -32,11 +43,15 @@ import com.fossil.vn.R;
 import java.util.List;
 
 public abstract class TemplateActivity extends AppCompatActivity implements OnNavigationItemSelectedListener {
+    final int REQUEST_LOCATION = 4;
+    final int REQUEST_LOCATION_SETTING = 8;
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         return true;
     }
 
+    protected LinearLayout normalView, initView;
     protected NavigationView nvwMainView;
     protected Toolbar tlrMainToolBar;
     protected DrawerLayout dltMainDrawer;
@@ -49,6 +64,9 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_template);
 
+        normalView = findViewById(R.id.ll_normal_view);
+        initView = findViewById(R.id.ll_init_request);
+
         nvwMainView = findViewById(R.id.activity_template_navview);
         tlrMainToolBar = findViewById(R.id.activity_template_toolbar);
         dltMainDrawer = findViewById(R.id.activity_template_drawer);
@@ -60,11 +78,6 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -212,63 +225,6 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         this.startActivity(intent);
     }
-    /*
-    private void goToRegisterPage() {
-        if (this instanceof RegisterActivity)
-            return;
-        Intent intent = new Intent(this, RegisterActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        this.startActivity(intent);
-    }
-
-    protected void goToSignInPage() {
-        if (this instanceof SignInActivity)
-            return;
-        Intent intent = new Intent(this, SignInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        this.startActivityForResult(intent, 101);
-    }
-
-    private void goToBookingPage() {
-        if (this instanceof OrderMainActivity)
-            return;
-        Intent intent = new Intent(this, OrderMainActivity.class);
-        this.startActivity(intent);
-    }
-
-    private void goToFaqsPage(){
-        if (this instanceof FaqsActivity)
-            return;
-        Intent intent = new Intent(this, FaqsActivity.class);
-        this.startActivity(intent);
-    }
-
-    public void goToAboutUsPage(){
-        if (this instanceof AboutUsActivity)
-            return;
-        Intent intent = new Intent(this, AboutUsActivity.class);
-        this.startActivity(intent);
-    }
-
-    public void goToContactUsPage(){
-        if (this instanceof ContactUsActivity)
-            return;
-        Intent intent = new Intent(this, ContactUsActivity.class);
-        this.startActivity(intent);
-    }
-
-    private void goToProfileBasedPage(int mode) {
-        Intent intent = new Intent(this, ProfileActivity.class);
-        intent.putExtra("mode", mode);
-        this.startActivity(intent);
-    }
-
-    public void goToNotificationPage(){
-        if (this instanceof NotificationActivity)
-            return;
-        Intent intent = new Intent(this, NotificationActivity.class);
-        this.startActivity(intent);
-    }*/
 
     private void renderNavigationMenus() {
         nvwMainView.setVerticalScrollBarEnabled(false);
@@ -292,15 +248,13 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         return viwCustom;
     }
 
-    private void signOut() {
-
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         renderNavigationMenus();
         refreshUI();
+        boolean isReady = requestPermission();
+        initCurrentState(isReady);
     }
 
     public interface FragmentBackListener {
@@ -316,80 +270,7 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
     }
 
     private void updateViews() {
-        /*View view = this.setSingleNavigationMenu(R.id.navbar_header_home, R.drawable.ic_home, R.string.title_Home, true);
-        view.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dltMainDrawer.closeDrawer(GravityCompat.START);
-                        goToHomePage();
-                    }
-                }
-        );
-        view = this.setSingleNavigationMenu(R.id.navbar_header_contact, R.drawable.ic_contact, R.string.title_ContactUs, true);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dltMainDrawer.closeDrawer(GravityCompat.START);
-                goToContactUsPage();
-            }
-        });
-        view = this.setSingleNavigationMenu(R.id.navbar_header_mybooking, R.drawable.ic_my_booking, R.string.title_MyBookings, true);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dltMainDrawer.closeDrawer(GravityCompat.START);
-                goToBookingPage();
-            }
-        });
-        view = this.setSingleNavigationMenu(R.id.navbar_header_myprofile, R.drawable.ic_my_profile, R.string.title_MyProfile, true);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dltMainDrawer.closeDrawer(GravityCompat.START);
-                goToProfileBasedPage(0);
-            }
-        });
-        view = this.setSingleNavigationMenu(R.id.navbar_header_changepass, R.drawable.ic_password, R.string.ChangePassword, true);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dltMainDrawer.closeDrawer(GravityCompat.START);
-                goToProfileBasedPage(1);
-            }
-        });
-        view = this.setSingleNavigationMenu(R.id.navbar_header_signout, R.drawable.ic_sign_out, R.string.SignOut, false);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dltMainDrawer.closeDrawer(GravityCompat.START);
-                signOut();
-            }
-        });
-        view = this.setSingleNavigationMenu(R.id.navbar_header_faq, R.drawable.ic_faq, R.string.title_FAQs, true);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dltMainDrawer.closeDrawer(GravityCompat.START);
-                goToFaqsPage();
-            }
-        });
-        view = this.setSingleNavigationMenu(R.id.navbar_header_about, R.drawable.ic_eb, R.string.title_AboutEasybook, true);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dltMainDrawer.closeDrawer(GravityCompat.START);
-                goToAboutUsPage();
-            }
-        });
-        view = this.setSingleNavigationMenu(R.id.navbar_header_notification, R.drawable.ic_notif, R.string.title_Notifications, true);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dltMainDrawer.closeDrawer(GravityCompat.START);
-                goToNotificationPage();
-            }
-        });*/
+
     }
 
     protected void refreshCurrentFragment() {
@@ -398,4 +279,81 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         stackedFragments.get(stackedFragments.size() - 1).onStart();
     }
 
+    private boolean requestPermission() {
+        int permissionLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+
+        if (permissionLocation != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(this)
+                        .setMessage("You need to allow access to GPS location")
+                        .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ActivityCompat.requestPermissions(TemplateActivity.this, Constants.PERMISSIONS_LOCATION,
+                                        REQUEST_LOCATION);
+                            }
+                        });
+                adb.create().show();
+                return false;
+            }
+
+
+            ActivityCompat.requestPermissions(this, Constants.PERMISSIONS_LOCATION, REQUEST_LOCATION);
+            return false;
+        }
+
+        boolean isGpsEnable = Utils.isLocationEnable(this);
+        if (!isGpsEnable) {
+            requestGPSLocationSetting();
+            return false;
+        }
+        return true;
+    }
+
+    private void requestGPSLocationSetting() {
+        Toast.makeText(this, "Need to request GPS Location Permission", Toast.LENGTH_SHORT).show();
+        startActivityForResult(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), REQUEST_LOCATION_SETTING);
+    }
+
+    /**
+     * Called when startActivityForResult() call is completed. The result of
+     * activation could be success of failure, mostly depending on user okaying
+     * this app's request to administer the device.
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_LOCATION_SETTING:
+                if (!Utils.isLocationEnable(this)) {
+                    requestGPSLocationSetting();
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_LOCATION:
+            {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(TemplateActivity.this, "TrackMe needs to access GPS permission", Toast.LENGTH_SHORT).show();
+                    initCurrentState(false);
+                }
+                return;
+            }
+        }
+    }
+
+    private void initCurrentState(boolean isReady) {
+        initView.setVisibility(isReady ? View.GONE : View.VISIBLE);
+        normalView.setVisibility(isReady ? View.VISIBLE : View.GONE);
+    }
 }

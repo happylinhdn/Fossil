@@ -7,29 +7,73 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start"
-    tools:context=".common.TemplateActivity">
+    tools:context=".common.TemplateActivity"
+    tools:openDrawer="start">
+
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-        <android.support.design.widget.AppBarLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:layout_height="match_parent">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/activity_template_toolbar"
+            <LinearLayout
+                android:id="@+id/ll_normal_view"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
-        </android.support.design.widget.AppBarLayout>
-        <FrameLayout
-            android:id="@+id/activity_template_frame"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <android.support.design.widget.AppBarLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/AppTheme.AppBarOverlay">
+
+                    <android.support.v7.widget.Toolbar
+                        android:id="@+id/activity_template_toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="?attr/colorPrimary"
+                        app:popupTheme="@style/AppTheme.PopupOverlay" />
+                </android.support.design.widget.AppBarLayout>
+
+                <FrameLayout
+                    android:id="@+id/activity_template_frame"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_init_request"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="This application need to enable GPS setting" />
+
+                <Button
+                    android:id="@+id/btn_accept"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Accept" />
+
+                <Button
+                    android:id="@+id/btn_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Close" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
