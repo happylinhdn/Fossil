@@ -18,8 +18,7 @@ public class RecordSession {
     private int id;
 
     @ColumnInfo(name = "_start_time")
-    @TypeConverters({Converter.class})
-    private Date startTime;
+    private long startTime;
 
     @ColumnInfo(name = "_nodes")
     @TypeConverters({Converter.class})
@@ -32,8 +31,15 @@ public class RecordSession {
     @TypeConverters({Converter.class})
     private Date endTime;
 
-    public RecordSession(Date startTime, List<Node> nodes, boolean isFinished) {
+    public RecordSession(long startTime, List<Node> nodes, boolean isFinished, Date endTime) {
         this.startTime = startTime;
+        this.nodes = nodes;
+        this.isFinished = isFinished;
+        this.endTime = endTime;
+    }
+
+    public RecordSession(Date startTime, List<Node> nodes, boolean isFinished) {
+        this.startTime = startTime.getTime();
         this.nodes = nodes;
         this.isFinished = isFinished;
     }
@@ -46,12 +52,8 @@ public class RecordSession {
         this.id = id;
     }
 
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public Date getStartTimeDate() {
+        return new Date(startTime);
     }
 
     public Date getEndTime() {
@@ -76,5 +78,13 @@ public class RecordSession {
 
     public void setFinished(boolean finished) {
         isFinished = finished;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public long getStartTime() {
+        return startTime;
     }
 }

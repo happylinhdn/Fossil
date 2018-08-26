@@ -39,13 +39,7 @@ public class RecordSessionRepository {
         mRecordSessionDao = db.recordSessionDao();
     }
 
-    public void createNewRecord() {
-        RecordSession recordSession = new RecordSession(Calendar.getInstance().getTime(), new ArrayList<Node>(), false);
-        AgentAsyncTask task = new AgentAsyncTask();
-        task.execute(recordSession);
-    }
-
-    public void updateRecord(RecordSession recordSession) {
+    public void updateOrCreateRecord(RecordSession recordSession) {
         AgentAsyncTask task = new AgentAsyncTask();
         task.execute(recordSession);
     }

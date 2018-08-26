@@ -1,14 +1,20 @@
 package com.fossil.vn.service;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 
+import com.fossil.vn.common.Constants;
+import com.fossil.vn.common.Converter;
 import com.fossil.vn.common.Node;
+import com.fossil.vn.common.Utils;
 import com.fossil.vn.room.entity.RecordSession;
 import com.fossil.vn.room.repository.RecordSessionRepository;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -78,7 +84,7 @@ public class LocationListener implements android.location.LocationListener {
             double lon = mLastLocation.getLongitude();
         }
 
-        //Todo : update database for current session record
+        //Update database for current session record
         final RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(mContext);
         recordSessionRepository.getLastRecord()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -86,8 +92,13 @@ public class LocationListener implements android.location.LocationListener {
                 .subscribe(new Consumer<RecordSession>() {
                     @Override
                     public void accept(RecordSession recordSession) throws Exception {
-                        recordSession.getNodes().add(new Node(mLastLocation, Calendar.getInstance().getTime()));
-                        recordSessionRepository.updateRecord(recordSession);
+                        if (recordSession == null) {
+                            recordSession = new RecordSession(Utils.getCurrent(), new ArrayList<Node>(), false);
+                        }
+                        recordSession.getNodes().add(new Node(mLastLocation, Utils.getCurrent()));
+                        recordSessionRepository.updateOrCreateRecord(recordSession);
+                        System.out.println("LINH update: " + Converter.fromDate(recordSession.getStartTimeDate()));
+                        LocalBroadcastManager.getInstance(mContext.getApplicationContext()).sendBroadcast(new Intent(Constants.DATA_UPDATE_EVENT));
                     }
                 }, new Consumer<Throwable>() {
                     @Override

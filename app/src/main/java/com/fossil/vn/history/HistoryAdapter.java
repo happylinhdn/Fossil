@@ -1,18 +1,28 @@
 package com.fossil.vn.history;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fossil.vn.R;
+import com.fossil.vn.common.Constants;
+import com.fossil.vn.common.Converter;
+import com.fossil.vn.common.Node;
+import com.fossil.vn.common.Utils;
 import com.fossil.vn.room.entity.RecordSession;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +72,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         TextView tvSpeed;
         TextView tvDistance;
         TextView tvDuration;
+        TextView tvTest;
         GoogleMap map;
         View layout;
 
@@ -72,6 +83,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             tvSpeed = layout.findViewById(R.id.tv_speed);
             tvDistance = layout.findViewById(R.id.tv_distance);
             tvDuration = layout.findViewById(R.id.tv_duration);
+            tvTest = layout.findViewById(R.id.tv_test);
             if (mapView != null) {
                 // Initialise the MapView
                 mapView.onCreate(null);
@@ -89,16 +101,66 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
         private void setMapLocation() {
             if (map == null) return;
+            map.clear();
 
             RecordSession data = (RecordSession) mapView.getTag();
             if (data == null) return;
+            if (data.getNodes().size() == 0) return;
+            int sizeNode = data.getNodes().size();
+            Node firstNode = data.getNodes().get(0);
+            Node lastNode = data.getNodes().get(sizeNode - 1);
+            map.addMarker(new MarkerOptions().position(firstNode.getLatLng()).title("Start Tour"));
+            if (sizeNode > 1)
+                map.addMarker(new MarkerOptions().position(lastNode.getLatLng()).title("End Tour"));
 
-            //Todo: Add a marker for this item and set the camera
-//            map.moveCamera(CameraUpdateFactory.newLatLngZoom(data.getStartLocation(), 13f));
-//            map.addMarker(new MarkerOptions().position(data.getStartLocation()));
-
-            // Set the map type back to normal.
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(lastNode.getLatLng(), Constants.CAMERA_MAP_ZOOM_LEVEL));
             map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+            //Render history line
+            PolylineOptions polylineOptions = new PolylineOptions().width(5).color(Color.RED);
+            float allDistance = 0;
+            long allDuration = 0;
+            float allSpeed = 0;
+
+            Node node = null;
+            Node stNode = null;
+
+            for (int i = 0; i < sizeNode; i++) {
+                node = data.getNodes().get(i);
+                polylineOptions.add(node.getLatLng());
+
+                if (stNode != null) {
+                    // Distance in meter
+                    double distanceBetween = SphericalUtil.computeDistanceBetween(node.getLatLng(), stNode.getLatLng());
+                    //milliseconds
+                    long different = node.getTime().getTime() - stNode.getTime().getTime();
+                    long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
+
+                    if (elapsedSeconds > 0) {
+                        double speed = distanceBetween / elapsedSeconds;
+                        allSpeed += speed;
+                    }
+
+                    allDistance += distanceBetween;
+                    allDuration += elapsedSeconds;
+                }
+
+                stNode = node;
+            }
+
+            map.addPolyline(polylineOptions);
+
+            // calculate avg speed, duration
+            float avgSpeed = 0;
+            if (allDuration != 0 && sizeNode > 1) {
+                avgSpeed = allDistance / allDuration;
+//                avgSpeed = avgSpeed / (sizeNode - 1);
+            }
+
+            // Just show meter/second for demo
+            tvDistance.setText(allDistance + " m");
+            tvSpeed.setText(String.format("%.2f m/s", avgSpeed));
+            tvDuration.setText(Utils.getStringFromSecond(allDuration));
         }
 
         private void bindView(int pos) {
@@ -109,9 +171,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             // coordinate of a location, when setting the map location.
             mapView.setTag(item);
             setMapLocation();
-            tvDistance.setText("100 km");
-            tvSpeed.setText("100 km/h");
-            tvDuration.setText("10:00:00");
+            tvDistance.setText("- m");
+            tvSpeed.setText("- m/s");
+            tvDuration.setText("00:00:00");
+            tvTest.setText(Converter.fromDate(item.getStartTimeDate()));
         }
     }
 }

@@ -85,11 +85,12 @@
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
 
                 <TextView
-                    android:visibility="gone"
+                    android:id="@+id/tv_test"
+                    android:visibility="visible"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Duration"
+                    android:text="test"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
 
             </LinearLayout>

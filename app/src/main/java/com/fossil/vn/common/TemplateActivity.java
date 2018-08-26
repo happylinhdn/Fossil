@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
@@ -18,6 +19,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -258,22 +260,42 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
     }
 
     public void startRecord() {
-        //Todo : start service, create new record with isFinished = false
-        Intent intent = new Intent(this, TrackingService.class);
-        intent.putExtra(TrackingService.EVENT_EXTRA, TrackingService.ACTION_NEW_RECORD);
+        Intent intent = new Intent(getApplicationContext(), TrackingService.class);
         startService(intent);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intentStart = new Intent();
+                intentStart.setAction(Constants.START_EVENT);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentStart);
+            }
+        }, 200);
+
+
     }
 
     public void pauseRecord() {
-        //Todo: send message to service to skip tracking event
+        Intent intent = new Intent();
+        intent.setAction(Constants.PAUSE_EVENT);
+        LocalBroadcastManager.getInstance(this.getApplicationContext()).sendBroadcast(intent);
     }
 
     public void resumeRecord() {
-        //Todo: send message to service to resume tracking
+        Intent intent = new Intent();
+        intent.setAction(Constants.RESUME_EVENT);
+        LocalBroadcastManager.getInstance(this.getApplicationContext()).sendBroadcast(intent);
     }
 
     public void stopRecord() {
-        // Todo: stop service , update record with isFinished = true
+        // Stop service , update record with isFinished = true
+        Intent intent = new Intent();
+        intent.setAction(Constants.STOP_EVENT);
+        LocalBroadcastManager.getInstance(this.getApplicationContext()).sendBroadcast(intent);
+
+//        Intent intentStop = new Intent(getApplicationContext(), TrackingService.class);
+//        stopService(intentStop);
     }
 
     public interface FragmentBackListener {

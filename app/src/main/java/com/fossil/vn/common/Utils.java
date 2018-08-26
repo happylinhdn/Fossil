@@ -12,9 +12,17 @@ import com.fossil.vn.R;
 import com.fossil.vn.common.BaseFragment;
 import com.fossil.vn.common.TemplateActivity;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class Utils {
+
+    public static Date getCurrent() {
+        return Calendar.getInstance(Locale.US).getTime();
+    }
+
     public static void hideSoftKeyboard(Activity activity){
         InputMethodManager inputMethodManager = (InputMethodManager)activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(),0);
@@ -45,5 +53,16 @@ public class Utils {
         boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
         return (isGPSEnabled || isNetworkEnabled);
+    }
+
+    public static String getStringFromSecond(long seconds) {
+        long value = seconds;
+        long elapsedHours = value / Constants.HOURS_IN_SECOND;
+        value = value % Constants.HOURS_IN_SECOND;
+        long elapsedMins = value / Constants.MINUTES_IN_SECOND;
+        value = value % Constants.MINUTES_IN_SECOND;
+
+
+        return String.format("%02d:%02d:%02d", elapsedHours, elapsedMins, value);
     }
 }
