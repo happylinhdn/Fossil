@@ -76,9 +76,7 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         initView = findViewById(R.id.ll_init_request);
 
         nvwMainView = findViewById(R.id.activity_template_navview);
-//        tlrMainToolBar = findViewById(R.id.activity_template_toolbar);
         dltMainDrawer = findViewById(R.id.activity_template_drawer);
-//        this.initActionBar();
 
         this.registerListenerBase();
         this.setOrientation();

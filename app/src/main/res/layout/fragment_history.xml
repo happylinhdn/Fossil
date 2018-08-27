@@ -4,27 +4,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:gravity="center"
+        android:orientation="vertical">
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
-            android:scrollbars="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            />
+            android:scrollbars="vertical" />
+
+        <LinearLayout
+            android:id="@+id/ll_empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tab below button to create the tracking route" />
+        </LinearLayout>
+
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/btn_new_record"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_add_circle"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_add_circle"
             android:visibility="visible" />
     </RelativeLayout>
-
 
 
 </android.support.constraint.ConstraintLayout>

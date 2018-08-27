@@ -34,6 +34,7 @@ import static android.widget.LinearLayout.VERTICAL;
 public class HistoryFragment extends BaseFragment implements TemplateActivity.FragmentBackListener {
 
     private View viwCurrent;
+    private View llEmpty;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
     private GridLayoutManager mGridLayoutManager;
@@ -45,6 +46,7 @@ public class HistoryFragment extends BaseFragment implements TemplateActivity.Fr
         viwCurrent = inflater.inflate(R.layout.fragment_history, container, false);
         ((TemplateActivity) getActivity()).fragmentBackListener = this;
         mRecyclerView = viwCurrent.findViewById(R.id.recycler_view);
+        llEmpty = viwCurrent.findViewById(R.id.ll_empty);
         mGridLayoutManager = new GridLayoutManager(getActivity(), 2);
         mLinearLayoutManager = new LinearLayoutManager(getActivity());
 
@@ -60,15 +62,24 @@ public class HistoryFragment extends BaseFragment implements TemplateActivity.Fr
         btnAddRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                ((HistoryActivity)getActivity()).openNewRecord();
                 Intent intent = new Intent(getActivity(), RecordActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 getActivity().finish();
             }
         });
-
+        showEmptyView();
         return viwCurrent;
+    }
+
+    private void showEmptyView() {
+        if (historyAdapter != null && historyAdapter.getItemCount() > 0) {
+            llEmpty.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            llEmpty.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.GONE);
+        }
     }
 
     private RecyclerView.RecyclerListener mRecycleListener = new RecyclerView.RecyclerListener() {
@@ -125,15 +136,6 @@ public class HistoryFragment extends BaseFragment implements TemplateActivity.Fr
 
     private void initDataDemo() {
         RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getActivity().getApplicationContext());
-
-//        List<RecordSession> listData = new ArrayList<>();
-//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(-33.920455, 18.466941), new LatLng(-33.920455, 18.466941)));
-//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
-//        listData.add(new RecordModel(100, 10, 0L, 0L, new LatLng(10.7605174, 106.6968601), new LatLng(-33.920455, 18.466941)));
         recordSessionRepository.getAllRecord()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -141,6 +143,7 @@ public class HistoryFragment extends BaseFragment implements TemplateActivity.Fr
                     @Override
                     public void accept(List<RecordSession> recordSessions) throws Exception {
                         historyAdapter.initData(recordSessions);
+                        showEmptyView();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
