@@ -10,6 +10,7 @@ import com.fossil.vn.room.entity.RecordSession;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 @Dao
 public interface RecordSessionDao {
@@ -20,6 +21,6 @@ public interface RecordSessionDao {
     Flowable<List<RecordSession>> getAllRecord();
 
     @Query("SELECT * FROM record_session ORDER BY _start_time DESC LIMIT 1")
-    Flowable<RecordSession> getLastRecord();
+    Single<RecordSession> getLastRecord();
 
 }

@@ -38,8 +38,6 @@ public class RecordActivity extends TemplateActivity {
             finish();
             return;
         }
-        this.setActionBarTitle(false, true, "New Record");
-        hideMenuButton(true);
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         RecordFragment fragment = new RecordFragment();
         tx.replace(R.id.activity_template_frame, fragment);
@@ -69,14 +67,16 @@ public class RecordActivity extends TemplateActivity {
     }
 
     public void startTimeTrack() {
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
+        if (timer == null) {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
 
-            @Override
-            public void run() {
-                if(loadDataEvent != null) loadDataEvent.updateTimeTick();
-            }
-        }, 0, 1000);
+                @Override
+                public void run() {
+                    if(loadDataEvent != null) loadDataEvent.updateTimeTick();
+                }
+            }, 0, 1000);
+        }
     }
 
     public void stopTimeTrack() {

@@ -14,19 +14,21 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             map:liteMode="true"
-            map:mapType="none"/>
+            map:mapType="none" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:background="@color/colorPrimaryPurple"
+            android:orientation="horizontal"
+            android:padding="5dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_gravity="center">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tv_distance"
@@ -48,9 +50,9 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_gravity="center">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tv_speed"
@@ -72,9 +74,9 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_gravity="center">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tv_duration"
@@ -86,12 +88,12 @@
 
                 <TextView
                     android:id="@+id/tv_test"
-                    android:visibility="visible"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="test"
-                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+                    android:text="Duration"
+                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                    android:visibility="gone" />
 
             </LinearLayout>
 

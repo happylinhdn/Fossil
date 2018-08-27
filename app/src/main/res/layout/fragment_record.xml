@@ -2,25 +2,26 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
 
         <com.google.android.gms.maps.MapView
             android:id="@+id/lite_listrow_map"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            map:liteMode="true"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            map:liteMode="false"
             map:mapType="none" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"></View>
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_weight="1"></View>-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,7 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="100 km"
+                    android:text="- km"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
 
                 <TextView
@@ -63,7 +64,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="100 km/h"
+                    android:text="- km/h"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
 
                 <TextView
@@ -87,7 +88,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="01:00:00"
+                    android:text="00:00:00"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
 
                 <TextView

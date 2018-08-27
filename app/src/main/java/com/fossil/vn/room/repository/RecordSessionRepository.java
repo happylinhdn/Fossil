@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
@@ -44,8 +45,8 @@ public class RecordSessionRepository {
         task.execute(recordSession);
     }
 
-    public Flowable<RecordSession> getLastRecord() {
-        Flowable<RecordSession> results = mRecordSessionDao.getLastRecord();
+    public Single<RecordSession> getLastRecord() {
+        Single<RecordSession> results = mRecordSessionDao.getLastRecord();
         return results;
     }
 

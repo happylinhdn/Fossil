@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.fossil.vn.R;
 import com.fossil.vn.common.BaseFragment;
+import com.fossil.vn.common.MapViewHolder;
 import com.fossil.vn.common.TemplateActivity;
 import com.fossil.vn.record.RecordActivity;
 import com.fossil.vn.room.entity.RecordSession;
@@ -74,13 +75,10 @@ public class HistoryFragment extends BaseFragment implements TemplateActivity.Fr
 
         @Override
         public void onViewRecycled(RecyclerView.ViewHolder holder) {
-            HistoryAdapter.ViewHolder mapHolder = (HistoryAdapter.ViewHolder) holder;
-            if (mapHolder != null && mapHolder.map != null) {
-                // Clear the map and free up resources by changing the map type to none.
-                // Also reset the map when it gets reattached to layout, so the previous map would
-                // not be displayed.
-                mapHolder.map.clear();
-                mapHolder.map.setMapType(GoogleMap.MAP_TYPE_NONE);
+            MapViewHolder mapHolder = (MapViewHolder) holder;
+            if (mapHolder != null && mapHolder.getMap() != null) {
+                mapHolder.getMap().clear();
+                mapHolder.getMap().setMapType(GoogleMap.MAP_TYPE_NONE);
             }
         }
     };
@@ -93,9 +91,15 @@ public class HistoryFragment extends BaseFragment implements TemplateActivity.Fr
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (historyAdapter != null) {
+            historyAdapter.cleanCached();
+        }
+    }
+
+    @Override
     public void refreshUI() {
-        ((HistoryActivity)getActivity()).setActionBarTitle(true, true, "History Record");
-        ((HistoryActivity)getActivity()).hideMenuButton(true);
         initDataDemo();
     }
 
@@ -116,7 +120,7 @@ public class HistoryFragment extends BaseFragment implements TemplateActivity.Fr
                     }
                 });
         builder.create().show();
-        return true;
+        return false;
     }
 
     private void initDataDemo() {

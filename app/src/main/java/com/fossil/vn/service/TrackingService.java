@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class TrackingService extends Service {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
 
     private Constants.ServiceState state = Constants.ServiceState.IDL;
 
@@ -107,8 +111,10 @@ public class TrackingService extends Service {
     }
 
     private void pauseTrackLocation() {
-        mLocationManager.removeUpdates(LocationListener.getInstance(getApplicationContext()));
-        mLocationManager = null;
+        if (mLocationManager != null) {
+            mLocationManager.removeUpdates(LocationListener.getInstance(getApplicationContext()));
+            mLocationManager = null;
+        }
     }
 
     private void resumeTrackLocation() {

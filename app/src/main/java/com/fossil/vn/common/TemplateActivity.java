@@ -40,9 +40,17 @@ import android.widget.Toast;
 import com.fossil.vn.history.HistoryFragment;
 import com.fossil.vn.history.HistoryActivity;
 import com.fossil.vn.R;
+import com.fossil.vn.record.RecordActivity;
+import com.fossil.vn.room.entity.RecordSession;
+import com.fossil.vn.room.repository.RecordSessionRepository;
 import com.fossil.vn.service.TrackingService;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public abstract class TemplateActivity extends AppCompatActivity implements OnNavigationItemSelectedListener {
     final int REQUEST_LOCATION = 4;
@@ -55,12 +63,10 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
 
     protected LinearLayout normalView, initView;
     protected NavigationView nvwMainView;
-    protected Toolbar tlrMainToolBar;
+//    protected Toolbar tlrMainToolBar;
     protected DrawerLayout dltMainDrawer;
-    protected ImageButton ibmDrawer, ibmBack, ibmHome;
-    protected TextView txtTitle;
-    protected LinearLayout titleOut;
     public FragmentBackListener fragmentBackListener = null;
+    public RecordSession lastRecord = null;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,9 +76,9 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         initView = findViewById(R.id.ll_init_request);
 
         nvwMainView = findViewById(R.id.activity_template_navview);
-        tlrMainToolBar = findViewById(R.id.activity_template_toolbar);
+//        tlrMainToolBar = findViewById(R.id.activity_template_toolbar);
         dltMainDrawer = findViewById(R.id.activity_template_drawer);
-        this.initActionBar();
+//        this.initActionBar();
 
         this.registerListenerBase();
         this.setOrientation();
@@ -85,15 +91,14 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
     @Override
     public void onBackPressed() {
         Utils.hideSoftKeyboard(this);
-        // cancell all requests
-        //APIRepo.Factory.cancelAllRequests();
 
         if (dltMainDrawer.isDrawerOpen(GravityCompat.START)) {
             dltMainDrawer.closeDrawer(GravityCompat.START);
         } else {
             if (fragmentBackListener != null) {
-                fragmentBackListener.onFragmentBackPressed();
-                fragmentBackListener = null;
+                if (fragmentBackListener.onFragmentBackPressed()) {
+                    fragmentBackListener = null;
+                }
             } else {
                 int count = getSupportFragmentManager().getBackStackEntryCount();
 
@@ -110,69 +115,13 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         }
     }
 
-
     private void registerListenerBase() {
         nvwMainView.setNavigationItemSelectedListener(this);
         nvwMainView.setVerticalScrollBarEnabled(false);
         final Activity activity = this;
-        ibmDrawer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dltMainDrawer.openDrawer(Gravity.LEFT);
-                Utils.hideSoftKeyboard(activity);
-            }
-        });
-        ibmBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TemplateActivity.this.onBackPressed();
-            }
-        });
-        ibmHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TemplateActivity.this.goToHomePage();
-            }
-        });
-    }
-
-    protected void initActionBar() {
-        setSupportActionBar(tlrMainToolBar);
-        tlrMainToolBar.setNavigationIcon(null);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setCustomView(R.layout.actionbar_custom);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setHomeButtonEnabled(false);
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(false);
-
-        ibmBack = findViewById(R.id.actionbar_backbutton);
-        ibmHome = findViewById(R.id.actionbar_homebutton);
-        ibmDrawer = findViewById(R.id.actionbar_drawerbutton);
-        txtTitle = findViewById(R.id.actionbar_title);
-        titleOut = findViewById(R.id.actionbar_titleOuter);
-    }
-
-    public String setActionBarTitle(boolean hideBackButton, boolean hideHomeButton, int titleID) {
-        String title = getString(titleID);
-        setActionBarTitle(hideBackButton, hideHomeButton, title);
-        return title;
     }
 
     public String setActionBarTitle(boolean hideBackButton, boolean hideHomeButton, String title) {
-        if (hideBackButton) {
-            ibmBack.setVisibility(View.GONE);
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) titleOut.getLayoutParams();
-            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        } else {
-            ibmBack.setVisibility(View.VISIBLE);
-        }
-        if (hideHomeButton) {
-            ibmHome.setVisibility(View.GONE);
-        } else {
-            ibmHome.setVisibility(View.VISIBLE);
-        }
-        txtTitle.setText(title);
         return title;
     }
 
@@ -219,41 +168,29 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         dltMainDrawer.closeDrawer(GravityCompat.START);
     }
 
-    protected void goToHomePage() {
-        if (this instanceof HistoryActivity && this.fragmentBackListener instanceof HistoryFragment) {
-            return;
-        }
-        Intent intent = new Intent(this, HistoryActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        this.startActivity(intent);
-    }
-
-    private void renderNavigationMenus() {
-        nvwMainView.setVerticalScrollBarEnabled(false);
-        final TextView txtViewCurrency = nvwMainView.getHeaderView(0).findViewById(R.id.nav_header_currency);
-        final ImageView imgViewCountry = nvwMainView.getHeaderView(0).findViewById(R.id.nav_header_country);
-        final TextView txtViewLang = nvwMainView.getHeaderView(0).findViewById(R.id.nav_header_lang);
-
-        updateViews();
-    }
-
-    private View setSingleNavigationMenu(final int viewID, int imgID, int mainTextID, boolean hasDivider) {
-        View viwCustom = nvwMainView.getHeaderView(0).findViewById(viewID);
-        ImageView icon = (ImageView) viwCustom.findViewById(R.id.item_menu_icon);
-        icon.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), imgID));
-        TextView title = (TextView) viwCustom.findViewById(R.id.item_menu_title);
-        title.setText(getString(mainTextID));
-
-        if (!hasDivider) {
-            viwCustom.findViewById(R.id.item_menudrawer_divider).setVisibility(View.GONE);
-        }
-        return viwCustom;
-    }
-
     @Override
     public void onResume() {
         super.onResume();
-        renderNavigationMenus();
+        lastRecord = null;
+        // Check to redirect to Record fragment
+        final RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getApplicationContext());
+        recordSessionRepository.getLastRecord()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<RecordSession>() {
+                    @Override
+                    public void accept(RecordSession recordSession) throws Exception {
+                        lastRecord = recordSession;
+                        if (recordSession != null && !recordSession.isFinished()) {
+                            moveToRecordActivity();
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                });
         refreshUI();
         boolean isReady = requestPermission();
         initCurrentState(isReady);
@@ -262,16 +199,23 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
     public void startRecord() {
         Intent intent = new Intent(getApplicationContext(), TrackingService.class);
         startService(intent);
+        lastRecord = null;
 
-        Handler handler = new Handler();
+        final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                handler.removeCallbacks(this);
+                final RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getApplicationContext());
+                RecordSession recordSession = new RecordSession(Utils.getCurrent(), new ArrayList<Node>(), false);
+                recordSessionRepository.updateOrCreateRecord(recordSession);
+                lastRecord = recordSession;
+
                 Intent intentStart = new Intent();
                 intentStart.setAction(Constants.START_EVENT);
                 LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentStart);
             }
-        }, 200);
+        }, 100);
 
 
     }
@@ -283,9 +227,21 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
     }
 
     public void resumeRecord() {
-        Intent intent = new Intent();
-        intent.setAction(Constants.RESUME_EVENT);
-        LocalBroadcastManager.getInstance(this.getApplicationContext()).sendBroadcast(intent);
+        Intent intentResume = new Intent(getApplicationContext(), TrackingService.class);
+        startService(intentResume);
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                handler.removeCallbacks(this);
+                Intent intent = new Intent();
+                intent.setAction(Constants.RESUME_EVENT);
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+            }
+        }, 100);
+
+
     }
 
     public void stopRecord() {
@@ -296,6 +252,27 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
 
 //        Intent intentStop = new Intent(getApplicationContext(), TrackingService.class);
 //        stopService(intentStop);
+
+        final RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getApplicationContext());
+        recordSessionRepository.getLastRecord()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Consumer<RecordSession>() {
+                    @Override
+                    public void accept(RecordSession recordSession) throws Exception {
+                        if (recordSession == null) {
+                            return;
+                        }
+                        recordSession.setFinished(true);
+                        recordSessionRepository.updateOrCreateRecord(recordSession);
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent(Constants.DATA_UPDATE_EVENT));
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+
+                    }
+                });
     }
 
     public interface FragmentBackListener {
@@ -303,21 +280,9 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
     }
 
     public void hideMenuButton(boolean hide) {
-        ibmDrawer.setVisibility(hide ? View.GONE : View.VISIBLE);
-        ibmHome.setVisibility(hide ? View.GONE : View.VISIBLE);
     }
 
     private void refreshUI() {
-    }
-
-    private void updateViews() {
-
-    }
-
-    protected void refreshCurrentFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        List<Fragment> stackedFragments = fragmentManager.getFragments();
-        stackedFragments.get(stackedFragments.size() - 1).onStart();
     }
 
     private boolean requestPermission() {
@@ -396,5 +361,16 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
     private void initCurrentState(boolean isReady) {
         initView.setVisibility(isReady ? View.GONE : View.VISIBLE);
         normalView.setVisibility(isReady ? View.VISIBLE : View.GONE);
+    }
+
+    private void moveToRecordActivity() {
+        if (this instanceof RecordActivity) {
+
+        } else {
+            Intent intent = new Intent(this, RecordActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        }
     }
 }

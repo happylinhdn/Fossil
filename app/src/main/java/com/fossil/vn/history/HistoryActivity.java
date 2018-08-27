@@ -19,8 +19,6 @@ public class HistoryActivity extends TemplateActivity {
             finish();
             return;
         }
-        this.setActionBarTitle(true, true, "History Record");
-        hideMenuButton(true);
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         HistoryFragment fragment = new HistoryFragment();
         tx.replace(R.id.activity_template_frame, fragment);

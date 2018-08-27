@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import com.fossil.vn.common.Constants;
 import com.fossil.vn.common.Converter;
+import com.fossil.vn.common.MapLoader;
 import com.fossil.vn.common.Node;
 import com.fossil.vn.common.Utils;
 import com.fossil.vn.room.entity.RecordSession;
@@ -44,7 +45,7 @@ public class LocationListener implements android.location.LocationListener {
     /**
      * @return the last know best location
      */
-    private Location getLastBestLocation(Context context) {
+    public static Location getLastBestLocation(Context context) {
         LocationManager locationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         try {
             Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -82,30 +83,31 @@ public class LocationListener implements android.location.LocationListener {
         if (mLastLocation != null) {
             double lat = mLastLocation.getLatitude();
             double lon = mLastLocation.getLongitude();
-        }
 
-        //Update database for current session record
-        final RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(mContext);
-        recordSessionRepository.getLastRecord()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<RecordSession>() {
-                    @Override
-                    public void accept(RecordSession recordSession) throws Exception {
-                        if (recordSession == null) {
-                            recordSession = new RecordSession(Utils.getCurrent(), new ArrayList<Node>(), false);
+            //Update database for current session record
+            final RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(mContext);
+            recordSessionRepository.getLastRecord()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Consumer<RecordSession>() {
+                        @Override
+                        public void accept(RecordSession recordSession) throws Exception {
+                            if (recordSession == null) {
+                                recordSession = new RecordSession(Utils.getCurrent(), new ArrayList<Node>(), false);
+                            }
+                            recordSession.getNodes().add(new Node(mLastLocation, Utils.getCurrent()));
+                            MapLoader.caculateCached(recordSession);
+                            recordSessionRepository.updateOrCreateRecord(recordSession);
+                            System.out.println("LINH update: " + Converter.fromDate(recordSession.getStartTimeDate()));
+                            LocalBroadcastManager.getInstance(mContext.getApplicationContext()).sendBroadcast(new Intent(Constants.DATA_UPDATE_EVENT));
                         }
-                        recordSession.getNodes().add(new Node(mLastLocation, Utils.getCurrent()));
-                        recordSessionRepository.updateOrCreateRecord(recordSession);
-                        System.out.println("LINH update: " + Converter.fromDate(recordSession.getStartTimeDate()));
-                        LocalBroadcastManager.getInstance(mContext.getApplicationContext()).sendBroadcast(new Intent(Constants.DATA_UPDATE_EVENT));
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
 
-                    }
-                });
+                        }
+                    });
+        }
 
     }
 

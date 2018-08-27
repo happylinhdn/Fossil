@@ -1,10 +1,12 @@
 package com.fossil.vn.record;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,8 @@ import com.fossil.vn.R;
 import com.fossil.vn.common.BaseFragment;
 import com.fossil.vn.common.Constants;
 import com.fossil.vn.common.Converter;
+import com.fossil.vn.common.MapLoader;
+import com.fossil.vn.common.MapViewHolder;
 import com.fossil.vn.common.Node;
 import com.fossil.vn.common.TemplateActivity;
 import com.fossil.vn.common.Utils;
@@ -39,35 +43,23 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 
-public class RecordFragment extends BaseFragment implements TemplateActivity.FragmentBackListener, OnMapReadyCallback, RecordActivity.LoadDataEvent {
+public class RecordFragment extends BaseFragment implements TemplateActivity.FragmentBackListener, RecordActivity.LoadDataEvent {
     private View viwCurrent;
-    MapView mapView;
-    TextView tvSpeed;
-    TextView tvDistance;
-    TextView tvDuration;
-    GoogleMap map;
+//    GoogleMap map;
     View btnStart;
     View btnPause;
     View btnResume;
     View btnStop;
     RecordSession data;
+    MapLoader mapLoader;
+    MapViewHolder mapViewHolder;
+    Constants.ServiceState currentState = Constants.ServiceState.IDL;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         viwCurrent = inflater.inflate(R.layout.fragment_record, container, false);
         ((TemplateActivity) getActivity()).fragmentBackListener = this;
-
-        mapView = viwCurrent.findViewById(R.id.lite_listrow_map);
-        tvSpeed = viwCurrent.findViewById(R.id.tv_speed);
-        tvDistance = viwCurrent.findViewById(R.id.tv_distance);
-        tvDuration = viwCurrent.findViewById(R.id.tv_duration);
-        if (mapView != null) {
-            // Initialise the MapView
-            mapView.onCreate(null);
-            // Set the map ready callback to receive the GoogleMap object
-            mapView.getMapAsync(this);
-        }
 
         btnStart = viwCurrent.findViewById(R.id.btn_start);
         btnPause = viwCurrent.findViewById(R.id.btn_pause);
@@ -97,6 +89,8 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
                 stopSession();
             }
         });
+        mapLoader = new MapLoader(getActivity());
+        mapViewHolder = new MapViewHolder(getActivity(), mapLoader, viwCurrent);
 
         return viwCurrent;
     }
@@ -109,9 +103,6 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
 
     @Override
     public void refreshUI() {
-        ((TemplateActivity)getActivity()).setActionBarTitle(false, true, "Add Record");
-        ((TemplateActivity)getActivity()).hideMenuButton(true);
-        //Update listener
         ((RecordActivity)getActivity()).loadDataEvent = this;
 
         final RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getActivity());
@@ -123,14 +114,18 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
                     public void accept(RecordSession recordSession) throws Exception {
                         if (recordSession.isFinished()) {
                             initStateSession(Constants.ServiceState.STOP);
+                            ((RecordActivity)getActivity()).stopTimeTrack();
                         } else {
                             initStateSession(Constants.ServiceState.START);
+                            ((RecordActivity)getActivity()).startTimeTrack();
+                            ((RecordActivity)getActivity()).resumeRecord();
                         }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-
+                        initStateSession(Constants.ServiceState.STOP);
+                        ((RecordActivity)getActivity()).stopTimeTrack();
                     }
                 });
     }
@@ -147,14 +142,28 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
 
     @Override
     public boolean onFragmentBackPressed() {
-        Intent intent = new Intent(getActivity(), HistoryActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        getActivity().finish();
-        return true;
+        if (currentState != Constants.ServiceState.STOP) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                    .setMessage("You are in tracking mode, please close it first")
+                    .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //Do nothing
+                        }
+                    });
+            builder.create().show();
+            return false;
+        } else {
+            Intent intent = new Intent(getActivity(), HistoryActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            getActivity().finish();
+            return true;
+        }
     }
 
     private void initStateSession(Constants.ServiceState state) {
+        currentState = state;
         switch (state) {
             case IDL:
                 btnStart.setVisibility(View.GONE);
@@ -186,97 +195,34 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
 
     private void startSession() {
         initStateSession(Constants.ServiceState.START);
-        ((TemplateActivity)getActivity()).startRecord();
         ((RecordActivity)getActivity()).startTimeTrack();
+        ((TemplateActivity)getActivity()).startRecord();
     }
 
     private void pauseSession() {
         initStateSession(Constants.ServiceState.PAUSE);
-        ((TemplateActivity)getActivity()).pauseRecord();
         ((RecordActivity)getActivity()).stopTimeTrack();
+        ((TemplateActivity)getActivity()).pauseRecord();
     }
 
     private void resumeSession() {
         initStateSession(Constants.ServiceState.START);
-        ((TemplateActivity)getActivity()).resumeRecord();
         ((RecordActivity)getActivity()).startTimeTrack();
+        ((TemplateActivity)getActivity()).resumeRecord();
     }
 
     private void stopSession() {
         initStateSession(Constants.ServiceState.STOP);
-        ((TemplateActivity)getActivity()).stopRecord();
         ((RecordActivity)getActivity()).stopTimeTrack();
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        MapsInitializer.initialize(getContext());
-        map = googleMap;
-        setMapLocation();
+        ((TemplateActivity)getActivity()).stopRecord();
     }
 
     private void setMapLocation() {
-        if (map == null) return;
-        map.clear();
-
-//        RecordSession data = (RecordSession) mapView.getTag();
-        if (data == null) return;
-        if (data.getNodes().size() == 0) return;
-        int sizeNode = data.getNodes().size();
-        Node firstNode = data.getNodes().get(0);
-        Node lastNode = data.getNodes().get(sizeNode - 1);
-        map.addMarker(new MarkerOptions().position(firstNode.getLatLng()).title("Start Tour"));
-        if (sizeNode > 1)
-            map.addMarker(new MarkerOptions().position(lastNode.getLatLng()).title("End Tour"));
-
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(lastNode.getLatLng(), Constants.CAMERA_MAP_ZOOM_LEVEL));
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-        PolylineOptions polylineOptions = new PolylineOptions().width(5).color(Color.RED);
-        float allDistance = 0;
-        long allDuration = 0;
-        float allSpeed = 0;
-        double lastSpeed = 0;
-
-        Node node = null;
-        Node stNode = null;
-
-        for (int i = 0; i < sizeNode; i++) {
-            node = data.getNodes().get(i);
-            polylineOptions.add(node.getLatLng());
-
-            if (stNode != null) {
-                // Distance in meter
-                double distanceBetween = SphericalUtil.computeDistanceBetween(node.getLatLng(), stNode.getLatLng());
-                //milliseconds
-                long different = node.getTime().getTime() - stNode.getTime().getTime();
-                long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
-
-                if (elapsedSeconds > 0) {
-                    lastSpeed = distanceBetween / elapsedSeconds;
-                    allSpeed += lastSpeed;
-                }
-
-                allDistance += distanceBetween;
-                allDuration += elapsedSeconds;
-            }
-
-            stNode = node;
+        if (data == null) {
+            mapLoader.DisplayMap(((TemplateActivity)getActivity()).lastRecord, mapViewHolder, true);
+        } else {
+            mapLoader.DisplayMap(data, mapViewHolder, true);
         }
-
-        map.addPolyline(polylineOptions);
-
-        // Calculate avg speed, duration
-        float avgSpeed = 0;
-        if (allDuration != 0 && sizeNode > 1) {
-            avgSpeed = allDistance / allDuration;
-//                avgSpeed = avgSpeed / (sizeNode - 1);
-        }
-
-        // Just show meter/second for demo
-        tvDistance.setText(allDistance + " m");
-        tvSpeed.setText(String.format("%.2f m/s", (float)lastSpeed));
-        tvDuration.setText(Utils.getStringFromSecond(allDuration));
     }
 
     @Override
@@ -293,7 +239,7 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
                             recordSession = new RecordSession(Utils.getCurrent(), new ArrayList<Node>(), false);
                         }
                         data = recordSession;
-                        mapView.setTag(recordSession);
+//                        mapView.setTag(recordSession);
                         setMapLocation();
                     }
                 }, new Consumer<Throwable>() {
@@ -306,14 +252,24 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
 
     @Override
     public void updateTimeTick() {
+        System.out.println("LINH updateTimeTick ");
+        long different = 0;
+        Date cur = Utils.getCurrent();
         if (data != null) {
-            Date cur = Utils.getCurrent();
-            long different = cur.getTime() - data.getStartTime();
-            System.out.println("updateTimeTick " + different);
-            if (different  > 0) {
-                long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
-                tvDuration.setText(Utils.getStringFromSecond(elapsedSeconds));
-            }
+            different = cur.getTime() - data.getStartTime();
+        } else if(((TemplateActivity)getActivity()).lastRecord != null) {
+            different = cur.getTime() - ((TemplateActivity)getActivity()).lastRecord.getStartTime();
+        }
+
+        System.out.println("LINH updateTimeTick " + different);
+        if (different  > 0) {
+            final long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mapViewHolder.updateDuration(elapsedSeconds);
+                }
+            });
         }
     }
 }
