@@ -3,6 +3,7 @@
     package="com.fossil.vn">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -35,6 +36,15 @@
         <service
             android:name=".service.TrackingService"
             android:enabled="true" />
+        <receiver android:name=".service.BootReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:label="BootReceiver"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
