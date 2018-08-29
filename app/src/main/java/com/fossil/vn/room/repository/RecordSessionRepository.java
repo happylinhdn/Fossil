@@ -64,37 +64,6 @@ public class RecordSessionRepository {
             return null;
         }
     }
-    /*public void searchTourPlacesByKeyword(String keyword, final ArrayList<DOPlace> bindingList, final LoadCallback callback) {
-        Flowable<List<TourPlace>> results = null;
-        if (TextUtils.isEmpty(keyword)) {
-            results = mTourDao.searchTourPlacesByKeyword(InMem.doSettings.getCountry().toUpperCase());
-        } else {
-            results = mTourDao.searchTourPlacesByKeyword("%" +keyword + "%", InMem.doSettings.getCountry().toUpperCase());
-        }
-        results.observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Consumer<List<TourPlace>>() {
-                    @Override
-                    public void accept(List<TourPlace> tourPlaces) throws Exception {
-                        for (TourPlace place : tourPlaces) {
-                            int placeId = place.getPlaceId();
-                            String placeName = place.getPlaceName();
-                            int subPlaceId = place.getSubPlaceId();
-                            String subPlaceName = place.getSubPlaceName();
-                            String countryCode = place.getCountryCode();
-                            String countryName = place.getCountryName();
-                            DOPlace doPlace = new DOPlace(placeId, placeName, subPlaceId, subPlaceName, countryCode, countryName);
-                            bindingList.add(doPlace);
-                        }
-                        callback.onLoaded();
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        callback.onLoaded();
-                    }
-                });
-    }*/
 
     public interface LoadCallback {
         public void onLoaded();

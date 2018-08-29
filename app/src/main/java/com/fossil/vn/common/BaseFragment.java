@@ -6,10 +6,6 @@ import android.view.animation.AnimationUtils;
 
 import com.fossil.vn.R;
 
-/**
- * Created by user on 31/3/2017.
- */
-
 public abstract class BaseFragment extends Fragment {
 
     public String title;
