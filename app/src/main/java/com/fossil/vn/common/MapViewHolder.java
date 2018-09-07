@@ -1,6 +1,7 @@
 package com.fossil.vn.common;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -11,14 +12,15 @@ import android.widget.TextView;
 
 import com.fossil.vn.R;
 import com.fossil.vn.room.entity.RecordSession;
-import com.fossil.vn.service.LocationListener;
-import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReadyCallback {
     MapView mapView;
@@ -29,6 +31,7 @@ public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReady
     View layout;
     Activity activity;
     MapLoader mapLoader;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     public MapViewHolder(Activity activity, MapLoader mapLoader, View itemView) {
         super(itemView);
@@ -46,6 +49,7 @@ public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReady
             // Set the map ready callback to receive the GoogleMap object
             mapView.getMapAsync(this);
         }
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
     }
 
     public MapView getMapView() {
@@ -76,28 +80,35 @@ public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReady
     public void onMapReady(GoogleMap googleMap) {
         MapsInitializer.initialize(activity);
         map = googleMap;
-        setMapLocation();
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        setMapLocation();
         map.setMyLocationEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
     }
 
+    @SuppressLint("MissingPermission")
     private void setMapLocation() {
         if (map == null) return;
         map.clear();
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        Location currentLocation = LocationListener.getLastBestLocation(activity);
-        if (currentLocation != null) {
-            LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Constants.CAMERA_MAP_ZOOM_LEVEL));
-        }
-
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(activity, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Constants.CAMERA_MAP_ZOOM_LEVEL));
+                        }
+                    }
+                });
         RecordSession data = (RecordSession) mapView.getTag();
         if (data == null) return;
         if (data.getNodes().size() == 0) return;
-        mapLoader.DisplayMap(data, this);
+        mapLoader.DisplayMap(data, MapViewHolder.this);
     }
 
     public void bindView(RecordSession item) {
@@ -124,5 +135,22 @@ public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReady
             tvSpeed.setText(String.format("%.2f Km/h", item.getSpeedInKmh()));
 
         }
+    }
+
+
+    public void onLowMemory() {
+        mapView.onLowMemory();
+    }
+
+    public void onPause() {
+        mapView.onPause();
+    }
+
+    public void onResume() {
+        mapView.onResume();
+    }
+
+    public void onDestroy() {
+        mapView.onDestroy();
     }
 }

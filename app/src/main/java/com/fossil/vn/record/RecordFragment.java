@@ -2,20 +2,16 @@ package com.fossil.vn.record;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.fossil.vn.R;
 import com.fossil.vn.common.BaseFragment;
 import com.fossil.vn.common.Constants;
-import com.fossil.vn.common.Converter;
 import com.fossil.vn.common.MapLoader;
 import com.fossil.vn.common.MapViewHolder;
 import com.fossil.vn.common.Node;
@@ -24,18 +20,8 @@ import com.fossil.vn.common.Utils;
 import com.fossil.vn.history.HistoryActivity;
 import com.fossil.vn.room.entity.RecordSession;
 import com.fossil.vn.room.repository.RecordSessionRepository;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -93,6 +79,30 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
         mapViewHolder = new MapViewHolder(getActivity(), mapLoader, viwCurrent);
 
         return viwCurrent;
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapViewHolder.onLowMemory();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapViewHolder.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapViewHolder.onResume();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mapViewHolder.onDestroy();
     }
 
     @Override
@@ -227,7 +237,6 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
 
     @Override
     public void needLoadData() {
-        System.out.println("needLoadData");
         final RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getActivity());
         recordSessionRepository.getLastRecord()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -239,7 +248,6 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
                             recordSession = new RecordSession(Utils.getCurrent(), new ArrayList<Node>(), false);
                         }
                         data = recordSession;
-//                        mapView.setTag(recordSession);
                         setMapLocation();
                     }
                 }, new Consumer<Throwable>() {
@@ -252,7 +260,6 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
 
     @Override
     public void updateTimeTick() {
-        System.out.println("LINH updateTimeTick ");
         long different = 0;
         Date cur = Utils.getCurrent();
         if (data != null) {
@@ -261,7 +268,6 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
             different = cur.getTime() - ((TemplateActivity)getActivity()).lastRecord.getStartTime();
         }
 
-        System.out.println("LINH updateTimeTick " + different);
         if (different  > 0) {
             final long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
             getActivity().runOnUiThread(new Runnable() {

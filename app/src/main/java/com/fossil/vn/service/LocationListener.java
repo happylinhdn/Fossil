@@ -1,33 +1,40 @@
 package com.fossil.vn.service;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.fossil.vn.common.Constants;
-import com.fossil.vn.common.Converter;
 import com.fossil.vn.common.MapLoader;
 import com.fossil.vn.common.Node;
 import com.fossil.vn.common.Utils;
 import com.fossil.vn.room.entity.RecordSession;
 import com.fossil.vn.room.repository.RecordSessionRepository;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class LocationListener implements android.location.LocationListener {
-    public static final int LOCATION_INTERVAL = 60000;
-    public static final float LOCATION_DISTANCE = 10f;
+import static android.content.Context.LOCATION_SERVICE;
+
+public class LocationListener {
+    public static final int LOCATION_INTERVAL = 6000;
+    public static final float LOCATION_DISTANCE = 2f;
 
     Context mContext;
     Location mLastLocation;
+
     private static LocationListener mInstance;
 
     public static LocationListener getInstance(Context context) {
@@ -40,13 +47,14 @@ public class LocationListener implements android.location.LocationListener {
     private LocationListener(Context context) {
         mContext = context;
         mLastLocation = getLastBestLocation(context);
+        init();
     }
 
     /**
      * @return the last know best location
      */
     public static Location getLastBestLocation(Context context) {
-        LocationManager locationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) context.getApplicationContext().getSystemService(LOCATION_SERVICE);
         try {
             Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             Location locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -72,8 +80,7 @@ public class LocationListener implements android.location.LocationListener {
         return null;
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
+    private void onLocationChanged(Location location) {
         makeUseOfNewLocation(location);
 
         if(mLastLocation == null){
@@ -98,7 +105,6 @@ public class LocationListener implements android.location.LocationListener {
                             recordSession.getNodes().add(new Node(mLastLocation, Utils.getCurrent()));
                             MapLoader.caculateCached(recordSession);
                             recordSessionRepository.updateOrCreateRecord(recordSession);
-                            System.out.println("LINH update: " + Converter.fromDate(recordSession.getStartTimeDate()));
                             LocalBroadcastManager.getInstance(mContext.getApplicationContext()).sendBroadcast(new Intent(Constants.DATA_UPDATE_EVENT));
                         }
                     }, new Consumer<Throwable>() {
@@ -109,26 +115,6 @@ public class LocationListener implements android.location.LocationListener {
                     });
         }
 
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
-
-    public Location getLastLocation() {
-        if (mLastLocation == null) {
-//            mLastLocation  = new Gson().fromJson(Preference.getString(mContext, mContext.getResources().getString(
-//                    R.string.shared_pref_location)), Location.class);
-        }
-        return mLastLocation;
     }
 
     /** Determines whether one location reading is better than the current location fix
@@ -194,5 +180,48 @@ public class LocationListener implements android.location.LocationListener {
         if ( isBetterLocation(location, mLastLocation) ) {
             mLastLocation = location;
         }
+    }
+
+
+    private LocationCallback mLocationCallback;
+    private LocationRequest mLocationRequest;
+    private FusedLocationProviderClient mFusedLocationClient;
+
+    @SuppressLint("MissingPermission")
+    private void init() {
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                mLastLocation = location;
+            }
+        });
+
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(LOCATION_INTERVAL);
+        mLocationRequest.setFastestInterval(LOCATION_INTERVAL);
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                    // Update UI with location data
+                    onLocationChanged(location);
+                }
+            };
+        };
+    }
+
+    @SuppressLint("MissingPermission")
+    public void startLocationUpdates() {
+        mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null /* Looper */);
+    }
+
+    public void stopLocationUpdates() {
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
 }
