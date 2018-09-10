@@ -2,13 +2,10 @@ package com.fossil.vn.common;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
@@ -22,23 +19,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fossil.vn.history.HistoryFragment;
-import com.fossil.vn.history.HistoryActivity;
 import com.fossil.vn.R;
 import com.fossil.vn.record.RecordActivity;
 import com.fossil.vn.room.entity.RecordSession;
@@ -177,7 +165,7 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Consumer<RecordSession>() {
                     @Override
-                    public void accept(RecordSession recordSession) throws Exception {
+                    public void accept(RecordSession recordSession) {
                         lastRecord = recordSession;
                         if (recordSession != null && !recordSession.isFinished()) {
                             moveToRecordActivity();
@@ -185,7 +173,7 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(Throwable throwable) throws Exception {
+                    public void accept(Throwable throwable) {
 
                     }
                 });

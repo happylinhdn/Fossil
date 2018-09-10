@@ -22,7 +22,6 @@ import com.fossil.vn.room.entity.RecordSession;
 import com.fossil.vn.room.repository.RecordSessionRepository;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -121,7 +120,7 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Consumer<RecordSession>() {
                     @Override
-                    public void accept(RecordSession recordSession) throws Exception {
+                    public void accept(RecordSession recordSession) {
                         if (recordSession.isFinished()) {
                             initStateSession(Constants.ServiceState.STOP);
                             ((RecordActivity)getActivity()).stopTimeTrack();
@@ -133,7 +132,7 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(Throwable throwable) throws Exception {
+                    public void accept(Throwable throwable) {
                         initStateSession(Constants.ServiceState.STOP);
                         ((RecordActivity)getActivity()).stopTimeTrack();
                     }
@@ -260,20 +259,11 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
 
     @Override
     public void updateTimeTick() {
-        long different = 0;
-        Date cur = Utils.getCurrent();
         if (data != null) {
-            different = cur.getTime() - data.getStartTime();
-        } else if(((TemplateActivity)getActivity()).lastRecord != null) {
-            different = cur.getTime() - ((TemplateActivity)getActivity()).lastRecord.getStartTime();
-        }
-
-        if (different  > 0) {
-            final long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mapViewHolder.updateDuration(elapsedSeconds);
+                    mapViewHolder.updateData(data);
                 }
             });
         }

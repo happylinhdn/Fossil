@@ -22,6 +22,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.Date;
+
 public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReadyCallback {
     MapView mapView;
     TextView tvSpeed;
@@ -118,9 +120,41 @@ public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReady
         // coordinate of a location, when setting the map location.
         mapView.setTag(item);
         setMapLocation();
-        tvDistance.setText("- Km");
-        tvSpeed.setText("- Km/h");
+        tvDistance.setText("- km");
+        tvSpeed.setText("- km/h");
         tvDuration.setText("00:00:00");
+    }
+
+    public void updateData(RecordSession item) {
+        mapView.setTag(item);
+        long different = 0;
+        Date cur = Utils.getCurrent();
+
+        if (item != null) {
+            different = cur.getTime() - item.getStartTime();
+        }
+
+        if (different  > 0) {
+            final long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
+            tvDuration.setText(Utils.getStringFromSecond(elapsedSeconds));
+        }
+
+        if (item == null) {
+            tvDistance.setText(String.format("%.2f km", 0f));
+            tvSpeed.setText(String.format("%.2f km/h", 0f));
+        } else {
+            if (item.getAllDistanceInKm() > 0) {
+                tvDistance.setText(String.format("%,.2f km", item.getAllDistanceInKm()));
+            } else {
+                tvDistance.setText(String.format("%,.2f m", item.getAllDistance()));
+            }
+
+            if (item.getSpeedInKmh() > 0) {
+                tvSpeed.setText(String.format("%,.2f km/h", item.getSpeedInKmh()));
+            } else {
+                tvSpeed.setText(String.format("%,.2f m/s", item.getAvgSpeed()));
+            }
+        }
     }
 
     public void updateDuration(long elapsedSeconds) {
@@ -131,9 +165,17 @@ public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReady
             tvDistance.setText(String.format("%.2f Km", 0f));
             tvSpeed.setText(String.format("%.2f Km/h", 0f));
         } else {
-            tvDistance.setText(String.format("%.2f Km", item.getAllDistanceInKm()));
-            tvSpeed.setText(String.format("%.2f Km/h", item.getSpeedInKmh()));
+            if (item.getAllDistanceInKm() > 0) {
+                tvDistance.setText(String.format("%,.2f Km", item.getAllDistanceInKm()));
+            } else {
+                tvDistance.setText(String.format("%,.2f M", item.getAllDistance()));
+            }
 
+            if (item.getSpeedInKmh() > 0) {
+                tvSpeed.setText(String.format("%,.2f Km/h", item.getSpeedInKmh()));
+            } else {
+                tvSpeed.setText(String.format("%,.2f M/h", item.getAvgSpeed()));
+            }
         }
     }
 
