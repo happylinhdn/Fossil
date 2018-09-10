@@ -6,6 +6,7 @@ import android.graphics.Color;
 import com.fossil.vn.room.entity.RecordSession;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
@@ -89,7 +90,9 @@ public class MapLoader {
         if (sizeNode > 1)
             cached.start = new MarkerOptions().position(lastNode.getLatLng()).title("End Tour");
 
-        cached.cameraLocation = CameraUpdateFactory.newLatLngZoom(lastNode.getLatLng(), Constants.CAMERA_MAP_ZOOM_LEVEL);
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+//        cached.cameraLocation = CameraUpdateFactory.newLatLngZoom(lastNode.getLatLng(), Constants.CAMERA_MAP_ZOOM_LEVEL);
 
         //Render history line
         PolylineOptions polylineOptions = new PolylineOptions().width(5).color(Color.RED);
@@ -104,6 +107,7 @@ public class MapLoader {
         for (int i = 0; i < sizeNode; i++) {
             node = data.getNodes().get(i);
             polylineOptions.add(node.getLatLng());
+            builder.include(node.getLatLng());
 
             if (stNode != null) {
                 // Distance in meter
@@ -123,6 +127,8 @@ public class MapLoader {
 
             stNode = node;
         }
+        LatLngBounds bounds = builder.build();
+        cached.cameraLocation = CameraUpdateFactory.newLatLngBounds(bounds, 0);
 
         // calculate avg speed, duration
         float avgSpeed = 0;

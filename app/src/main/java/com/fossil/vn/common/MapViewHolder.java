@@ -123,6 +123,7 @@ public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReady
         tvDistance.setText("- km");
         tvSpeed.setText("- km/h");
         tvDuration.setText("00:00:00");
+        updateData(item);
     }
 
     public void updateData(RecordSession item) {
