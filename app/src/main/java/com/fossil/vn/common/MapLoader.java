@@ -113,7 +113,7 @@ public class MapLoader {
                 // Distance in meter
                 double distanceBetween = SphericalUtil.computeDistanceBetween(node.getLatLng(), stNode.getLatLng());
                 //milliseconds
-                long different = node.getTime().getTime() - stNode.getTime().getTime();
+                long different = node.getTime() - stNode.getTime();
                 long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
 
                 if (elapsedSeconds > 0) {

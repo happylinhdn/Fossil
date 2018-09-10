@@ -244,7 +244,7 @@ public class RecordFragment extends BaseFragment implements TemplateActivity.Fra
                     @Override
                     public void accept(RecordSession recordSession) throws Exception {
                         if (recordSession == null) {
-                            recordSession = new RecordSession(Utils.getCurrent(), new ArrayList<Node>(), false);
+                            recordSession = new RecordSession(Utils.getCurrentTime(), new ArrayList<Node>(), false);
                         }
                         data = recordSession;
                         setMapLocation();

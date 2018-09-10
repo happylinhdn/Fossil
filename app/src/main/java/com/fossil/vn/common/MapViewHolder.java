@@ -129,14 +129,17 @@ public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReady
     public void updateData(RecordSession item) {
         mapView.setTag(item);
         long different = 0;
-        Date cur = Utils.getCurrent();
+        long curTime = Utils.getCurrentTime();
 
         if (item != null) {
-            different = cur.getTime() - item.getStartTime();
+            if (item.isFinished()) {
+                curTime = item.getEndTime();
+            }
+            different = curTime - item.getStartTime();
         }
 
         if (different  > 0) {
-            final long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
+            long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
             tvDuration.setText(Utils.getStringFromSecond(elapsedSeconds));
 
             if (item == null) {

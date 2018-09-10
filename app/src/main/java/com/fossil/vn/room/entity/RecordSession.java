@@ -10,7 +10,6 @@ import com.fossil.vn.common.Converter;
 import com.fossil.vn.common.MapCached;
 import com.fossil.vn.common.Node;
 
-import java.util.Date;
 import java.util.List;
 
 @Entity(tableName = "record_session")
@@ -30,8 +29,7 @@ public class RecordSession {
     private boolean isFinished;
 
     @ColumnInfo(name = "_end_time")
-    @TypeConverters({Converter.class})
-    private Date endTime;
+    private long endTime;
 
     @ColumnInfo(name = "_avg_speed")
     private float avgSpeed;
@@ -45,15 +43,15 @@ public class RecordSession {
     @Ignore
     public MapCached cached;
 
-    public RecordSession(long startTime, List<Node> nodes, boolean isFinished, Date endTime) {
-        this.startTime = startTime;
-        this.nodes = nodes;
-        this.isFinished = isFinished;
-        this.endTime = endTime;
-    }
+//    public RecordSession(long startTime, List<Node> nodes, boolean isFinished, long endTime) {
+//        this.startTime = startTime;
+//        this.nodes = nodes;
+//        this.isFinished = isFinished;
+//        this.endTime = endTime;
+//    }
 
-    public RecordSession(Date startTime, List<Node> nodes, boolean isFinished) {
-        this.startTime = startTime.getTime();
+    public RecordSession(long startTime, List<Node> nodes, boolean isFinished) {
+        this.startTime = startTime;
         this.nodes = nodes;
         this.isFinished = isFinished;
     }
@@ -66,15 +64,11 @@ public class RecordSession {
         this.id = id;
     }
 
-    public Date getStartTimeDate() {
-        return new Date(startTime);
-    }
-
-    public Date getEndTime() {
+    public long getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(long endTime) {
         this.endTime = endTime;
     }
 

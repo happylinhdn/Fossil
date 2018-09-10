@@ -10,13 +10,13 @@ public class Node {
     double lat;
     double lng;
     float accuracy;
-    String timeTrack;
+    long timeTrack;
 
-    public Node(Location location, Date timeTrack) {
+    public Node(Location location, long timeTrack) {
         this.lat = location.getLatitude();
         this.lng = location.getLongitude();
         this.accuracy = location.getAccuracy();
-        this.timeTrack = Converter.fromDate(timeTrack);
+        this.timeTrack = timeTrack;
     }
 
     public double getLat() {
@@ -43,11 +43,11 @@ public class Node {
         this.accuracy = accuracy;
     }
 
-    public String getTimeTrack() {
+    public long getTimeTrack() {
         return timeTrack;
     }
 
-    public void setTimeTrack(String timeTrack) {
+    public void setTimeTrack(long timeTrack) {
         this.timeTrack = timeTrack;
     }
 
@@ -55,7 +55,7 @@ public class Node {
         return new LatLng(lat, lng);
     }
 
-    public Date getTime() {
-        return Converter.fromTimestamp(timeTrack);
+    public long getTime() {
+        return timeTrack;
     }
 }

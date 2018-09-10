@@ -9,18 +9,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 
 import com.fossil.vn.R;
-import com.fossil.vn.common.BaseFragment;
-import com.fossil.vn.common.TemplateActivity;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class Utils {
-
-    public static Date getCurrent() {
-        return Calendar.getInstance(Locale.US).getTime();
+    public static long getCurrentTime() {
+        return Calendar.getInstance(Locale.US).getTimeInMillis();
     }
 
     public static void hideSoftKeyboard(Activity activity){

@@ -32,11 +32,10 @@ public class Converter {
     }
 
     @TypeConverter
-    public static String fromDate(Date date) {
+    public static String fromDate(long dateValue) {
         String dateInString = "";
-        if (date != null) {
-            dateInString = df.format(date.getTime());
-        }
+        Date date = new Date(dateValue) ;
+        dateInString = df.format(date);
         return dateInString;
     }
 

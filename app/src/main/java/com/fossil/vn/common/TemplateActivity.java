@@ -193,7 +193,7 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
             public void run() {
                 handler.removeCallbacks(this);
                 final RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getApplicationContext());
-                RecordSession recordSession = new RecordSession(Utils.getCurrent(), new ArrayList<Node>(), false);
+                RecordSession recordSession = new RecordSession(Utils.getCurrentTime(), new ArrayList<Node>(), false);
                 recordSessionRepository.updateOrCreateRecord(recordSession);
                 lastRecord = recordSession;
 

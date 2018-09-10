@@ -100,9 +100,9 @@ public class LocationListener {
                         @Override
                         public void accept(RecordSession recordSession) throws Exception {
                             if (recordSession == null) {
-                                recordSession = new RecordSession(Utils.getCurrent(), new ArrayList<Node>(), false);
+                                recordSession = new RecordSession(Utils.getCurrentTime(), new ArrayList<Node>(), false);
                             }
-                            recordSession.getNodes().add(new Node(mLastLocation, Utils.getCurrent()));
+                            recordSession.getNodes().add(new Node(mLastLocation, Utils.getCurrentTime()));
                             MapLoader.caculateCached(recordSession);
                             recordSessionRepository.updateOrCreateRecord(recordSession);
                             LocalBroadcastManager.getInstance(mContext.getApplicationContext()).sendBroadcast(new Intent(Constants.DATA_UPDATE_EVENT));
