@@ -141,13 +141,13 @@ public class HistoryFragment extends BaseFragment implements TemplateActivity.Fr
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Consumer<List<RecordSession>>() {
                     @Override
-                    public void accept(List<RecordSession> recordSessions) throws Exception {
+                    public void accept(List<RecordSession> recordSessions) {
                         historyAdapter.initData(recordSessions);
                         showEmptyView();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(Throwable throwable) throws Exception {
+                    public void accept(Throwable throwable) {
 
                     }
                 });

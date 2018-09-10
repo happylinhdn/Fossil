@@ -55,19 +55,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="This application need to enable GPS setting" />
-
-                <Button
-                    android:id="@+id/btn_accept"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Accept" />
-
-                <Button
-                    android:id="@+id/btn_close"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Close" />
+                    android:text="This application need to enable GPS setting"
+                    android:layout_gravity="center"
+                    android:gravity="center"/>
 
             </LinearLayout>
 

@@ -37,10 +37,10 @@ public class TrackingService extends Service {
             if (action.equals(Constants.START_EVENT)) {
                 state = ServiceState.START;
                 //Create new Record
-                RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getApplicationContext());
-                Date current = Utils.getCurrent();
-                RecordSession recordSession = new RecordSession(current, new ArrayList<Node>(), false);
-                recordSessionRepository.updateOrCreateRecord(recordSession);
+//                RecordSessionRepository recordSessionRepository = RecordSessionRepository.getInstance(getApplicationContext());
+//                Date current = Utils.getCurrent();
+//                RecordSession recordSession = new RecordSession(current, new ArrayList<Node>(), false);
+//                recordSessionRepository.updateOrCreateRecord(recordSession);
                 startTrackLocationListener();
             } else if (action.equals(Constants.PAUSE_EVENT)) {
                 state = ServiceState.PAUSE;

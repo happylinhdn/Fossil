@@ -21,7 +21,15 @@ public class MapCached {
         return allDistance/1000;
     }
 
+    public float getAllDistance() {
+        return allDistance;
+    }
+
     public float getSpeedInKmh() {
         return avgSpeed * 3.6f;
+    }
+
+    public float getSpeed() {
+        return avgSpeed;
     }
 }

@@ -29,7 +29,7 @@ import io.reactivex.schedulers.Schedulers;
 import static android.content.Context.LOCATION_SERVICE;
 
 public class LocationListener {
-    public static final int LOCATION_INTERVAL = 6000;
+    public static final int LOCATION_INTERVAL = 5000;
     public static final float LOCATION_DISTANCE = 2f;
 
     Context mContext;

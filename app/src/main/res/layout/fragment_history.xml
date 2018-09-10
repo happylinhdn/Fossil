@@ -21,13 +21,16 @@
             android:id="@+id/ll_empty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
+            android:gravity="center_horizontal"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tab below button to create the tracking route" />
+                android:text="Tap below button to create the tracking route"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textSize="18sp"/>
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton

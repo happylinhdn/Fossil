@@ -46,6 +46,8 @@ public class MapLoader {
 
     private void updateMapUI(MapViewHolder mapHolder, MapCached mapCached) {
         GoogleMap map = mapHolder.getMap();
+        map.clear();
+
         map.addMarker(mapCached.start);
         if (mapCached.end != null)
             map.addMarker(mapCached.end);
@@ -53,8 +55,19 @@ public class MapLoader {
         map.moveCamera(mapCached.cameraLocation);
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         map.addPolyline(mapCached.polylineOptions);
-        mapHolder.getTvDistance().setText(String.format("%.2f Km", mapCached.getAllDistanceInKm()));
-        mapHolder.getTvSpeed().setText(String.format("%.2f Km/h", mapCached.getSpeedInKmh()));
+
+
+        if (mapCached.getAllDistanceInKm() > 0) {
+            mapHolder.getTvDistance().setText(String.format("%,.2f km", mapCached.getAllDistanceInKm()));
+        } else {
+            mapHolder.getTvDistance().setText(String.format("%,.2f m", mapCached.getAllDistance()));
+        }
+
+        if (mapCached.getSpeedInKmh() > 0) {
+            mapHolder.getTvSpeed().setText(String.format("%,.2f km/h", mapCached.getSpeedInKmh()));
+        } else {
+            mapHolder.getTvSpeed().setText(String.format("%,.2f m/s", mapCached.getSpeed()));
+        }
         mapHolder.getTvDuration().setText(Utils.getStringFromSecond(mapCached.allDuration));
     }
 

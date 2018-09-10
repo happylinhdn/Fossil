@@ -275,7 +275,7 @@ public abstract class TemplateActivity extends AppCompatActivity implements OnNa
         int permissionLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
 
         if (permissionLocation != PackageManager.PERMISSION_GRANTED) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 AlertDialog.Builder adb = new AlertDialog.Builder(this)
                         .setMessage("You need to allow access to GPS location")
                         .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
