@@ -36,6 +36,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="100 km"
+                    android:textColor="@color/colorWhiteText"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
 
                 <TextView
@@ -43,6 +44,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Distance"
+                    android:textColor="@color/colorWhiteText"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
 
             </LinearLayout>
@@ -60,6 +62,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="100 km/h"
+                    android:textColor="@color/colorWhiteText"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
 
                 <TextView
@@ -67,6 +70,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Avg. Speed"
+                    android:textColor="@color/colorWhiteText"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
 
             </LinearLayout>
@@ -84,6 +88,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="01:00:00"
+                    android:textColor="@color/colorWhiteText"
                     android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
 
                 <TextView

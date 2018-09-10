@@ -138,24 +138,25 @@ public class MapViewHolder extends RecyclerView.ViewHolder implements OnMapReady
         if (different  > 0) {
             final long elapsedSeconds = different / Constants.SECONDS_IN_MIL;
             tvDuration.setText(Utils.getStringFromSecond(elapsedSeconds));
+
+            if (item == null) {
+                tvDistance.setText(String.format("%.2f km", 0f));
+                tvSpeed.setText(String.format("%.2f km/h", 0f));
+            } else {
+                if (item.getAllDistanceInKm() > 0) {
+                    tvDistance.setText(String.format("%,.2f km", item.getAllDistanceInKm()));
+                } else {
+                    tvDistance.setText(String.format("%,.2f m", item.getAllDistance()));
+                }
+
+                if (item.getSpeedInKmh() > 0) {
+                    tvSpeed.setText(String.format("%,.2f km/h", item.getSpeedInKmh()));
+                } else {
+                    tvSpeed.setText(String.format("%,.2f m/s", item.getAvgSpeed()));
+                }
+            }
         }
 
-        if (item == null) {
-            tvDistance.setText(String.format("%.2f km", 0f));
-            tvSpeed.setText(String.format("%.2f km/h", 0f));
-        } else {
-            if (item.getAllDistanceInKm() > 0) {
-                tvDistance.setText(String.format("%,.2f km", item.getAllDistanceInKm()));
-            } else {
-                tvDistance.setText(String.format("%,.2f m", item.getAllDistance()));
-            }
-
-            if (item.getSpeedInKmh() > 0) {
-                tvSpeed.setText(String.format("%,.2f km/h", item.getSpeedInKmh()));
-            } else {
-                tvSpeed.setText(String.format("%,.2f m/s", item.getAvgSpeed()));
-            }
-        }
     }
 
     public void updateDuration(long elapsedSeconds) {

@@ -88,14 +88,14 @@ public class MapLoader {
 
         cached.start = new MarkerOptions().position(firstNode.getLatLng()).title("Start Tour");
         if (sizeNode > 1)
-            cached.start = new MarkerOptions().position(lastNode.getLatLng()).title("End Tour");
+            cached.end = new MarkerOptions().position(lastNode.getLatLng()).title("End Tour");
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
 //        cached.cameraLocation = CameraUpdateFactory.newLatLngZoom(lastNode.getLatLng(), Constants.CAMERA_MAP_ZOOM_LEVEL);
 
         //Render history line
-        PolylineOptions polylineOptions = new PolylineOptions().width(5).color(Color.RED);
+        PolylineOptions polylineOptions = new PolylineOptions().width(10).color(Color.BLUE);
 
         float allDistance = 0;
         long allDuration = 0;
@@ -128,7 +128,7 @@ public class MapLoader {
             stNode = node;
         }
         LatLngBounds bounds = builder.build();
-        cached.cameraLocation = CameraUpdateFactory.newLatLngBounds(bounds, 0);
+        cached.cameraLocation = CameraUpdateFactory.newLatLngBounds(bounds, 50);
 
         // calculate avg speed, duration
         float avgSpeed = 0;
